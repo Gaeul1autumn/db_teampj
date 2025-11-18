@@ -406,5 +406,53 @@ class DatabaseHelper {
     ];
   }
 
+  // -----------------------------------------------------------------
+  // 📌 12. (신규) 부족한 재료 3개 이상 (부족한 순으로 정렬)
+  // -----------------------------------------------------------------
+  Future<List<Map<String, dynamic>>> getRecipesMissingThreeOrMoreSorted() async {
+    Database db = await instance.database;
+
+    //FIXME: 쿼리 작성
+    // ---------------------------------------------------------
+    // ⬇️ [사용자 직접 작성]
+    // ⬇️ (is_owned=1)을 기반으로, 부족한 재료가 "3개 이상"인 레시피를 찾는
+    // ⬇️ 쿼리를 작성하세요.
+    //
+    // ⬇️ (중요!) 쿼리 결과에 'missing_count' (부족한 재료 개수) 컬럼이
+    // ⬇️ *반드시* 포함되어야 하며, 이 값을 기준으로 정렬(ORDER BY)해야 합니다.
+    // ---------------------------------------------------------
+    
+    final String myCustomQuery = """
+      SELECT 
+        r.id as recipe_id, 
+        r.name as recipe_name, 
+        -- (예시) 부족한 재료 개수를 계산하는 로직
+        (COUNT(CASE WHEN i.is_owned = 0 THEN 1 END)) as missing_count
+      FROM recipes r
+      JOIN recipe_ingredients ri ON r.id = ri.recipe_id
+      JOIN ingredients i ON ri.ingredient_id = i.id
+      GROUP BY r.id, r.name
+      HAVING missing_count >= 3
+      ORDER BY 
+        missing_count ASC, -- 1. 부족한 개수 적은 순
+        r.name ASC;        -- 2. (같을 경우) 이름 가나다 순
+    """;
+    
+    // return await db.rawQuery(myCustomQuery);
+    
+    // ---------------------------------------------------------
+    // ⬆️ [사용자 직접 작성]
+    // ---------------------------------------------------------
+
+    // ⚠️ 임시 반환 값 (테스트용)
+    print("임시 데이터 (부족 3+ 정렬) 반환. 쿼리를 작성해주세요.");
+    await Future.delayed(const Duration(milliseconds: 500));
+    return [
+      {'recipe_id': 401, 'recipe_name': '갈비찜 (테스트)', 'missing_count': 3},
+      {'recipe_id': 402, 'recipe_name': '잡채 (테스트)', 'missing_count': 3},
+      {'recipe_id': 501, 'recipe_name': '신선로 (테스트)', 'missing_count': 5},
+    ];
+  }
+
   
 }

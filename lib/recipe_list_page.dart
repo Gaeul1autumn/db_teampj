@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'database_helper.dart'; 
 import 'missing_ingredients_page.dart';
 import 'recipe_detail_page.dart';
+import 'missing_ingredients_sorted_page.dart';
 
 // 1. DB 쿼리 결과를 담을 Recipe 모델
 // (쿼리 결과 컬럼명이 'recipe_id', 'recipe_name'이라고 가정)
@@ -112,6 +113,19 @@ class _RecipeListPageState extends State<RecipeListPage> {
                 );
               },
             ),
+            IconButton(
+            tooltip: '부족한 재료 3개 이상',
+            icon: const Icon(Icons.filter_3), // '3+' 아이콘
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  // 3번에서 만들 새 페이지로 이동
+                  builder: (context) => const MissingIngredientsSortedPage(),
+                ),
+              );
+            },
+          ), 
             const SizedBox(width: 8), // 우측 살짝 여백
           ],
           // -------------------------------------------------------

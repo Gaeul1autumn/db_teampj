@@ -310,9 +310,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             children: _steps.map((step) {
               return ListTile(
                 leading: CircleAvatar(
-                  child: Text('${step.stepNumber}'),
                   backgroundColor: Colors.blue.shade100,
                   foregroundColor: Colors.black,
+                  child: Text('${step.stepNumber}'),
                 ),
                 title: Text(step.description),
               );
