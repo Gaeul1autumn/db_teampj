@@ -40,6 +40,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -89,3 +90,19 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+
+flutter_launcher_icons:
+# 1. 사용할 이미지 파일 경로를 지정합니다.
+  image_path: "assets/icon.png" 
+
+  # 2. 아이콘을 적용할 플랫폼을 지정합니다.
+  android: true
+  ios: true
+
+  # 선택 사항: iOS에서 기존 아이콘을 덮어쓸지 지정합니다.
+  remove_original_ios_app_icon: true
+
+# Android 12 이상을 위한 Adaptive Icon 설정 (선택 사항)
+# adaptive_icon_background: "#FFFFFF" # 배경색 (hex code)
+# adaptive_icon_foreground: "assets/foreground.png" # 아이콘 전경 이미지 (테두리 부분 제외)

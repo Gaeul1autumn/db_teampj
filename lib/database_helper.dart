@@ -10,7 +10,7 @@ import 'recipe_detail_page.dart';
 class DatabaseHelper {
   // DB 파일 이름을 'my_data.db'로 가정합니다.
   // 1단계에서 사용한 파일 이름과 동일해야 합니다.
-  static const String _databaseName = "my_data.db";
+  static const String _databaseName = "app.db";
   static Database? _database;
 
   // 싱글톤 패턴: 앱 전체에서 이 인스턴스 하나만 사용
@@ -57,11 +57,6 @@ class DatabaseHelper {
     // 4. 데이터베이스 열기
     return await openDatabase(path);
   }
-
-  // -----------------------------------------------------------------
-  // 여기에 사용자가 직접 쿼리 함수를 만드시면 됩니다.
-  // (사용자 요청: 쿼리 부분은 직접 작성)
-  // -----------------------------------------------------------------
 
 
   // -----------------------------------------------------------------
