@@ -55,7 +55,7 @@ class _MainTabsPageState extends State<MainTabsPage> {
           ),
         ],
         currentIndex: _selectedIndex, // 현재 활성화된 탭
-        selectedItemColor: Colors.blue, // 활성화된 탭 색상
+        selectedItemColor: Color.fromARGB(207, 255, 136, 62), // 활성화된 탭 색상
         onTap: _onItemTapped, // 탭 클릭 시 2번 함수 호출
 
         // type: BottomNavigationBarType.fixed, FIXME: 탭 계속 활성화 원하면 주석 제거 지금은 선택한 탭만 활성화

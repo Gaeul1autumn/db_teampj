@@ -93,7 +93,11 @@ class _MissingIngredientsPageState extends State<MissingIngredientsPage> {
         title: Text(_appBarTitle), // 동적으로 설정된 제목
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+            child: CircularProgressIndicator(
+              color: Color.fromARGB(207, 255, 136, 62),
+            )
+          )
           : _buildRecipeList(),
     );
   }

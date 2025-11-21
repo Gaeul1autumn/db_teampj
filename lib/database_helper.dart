@@ -58,12 +58,24 @@ class DatabaseHelper {
     return await openDatabase(path);
   }
 
-
+  //FIXME: 쿼리 수정 리턴문 이대로 쓰면 안됨
   // -----------------------------------------------------------------
   // 📌 1. 'ingredients' 테이블에서 모든 재료 가져오기
   // (테이블명 'ingredients', 컬럼명 'id', 'name'으로 가정)
   // -----------------------------------------------------------------
   Future<List<Map<String, dynamic>>> getAllIngredients() async {
+    Database db = await instance.database;
+    // 'name' 컬럼 기준으로 가나다순 정렬
+    return await db.query('ingredients', orderBy: 'name ASC');
+    
+  }
+
+  //FIXME: 쿼리 수정 리턴문 이대로 쓰면 안됨
+  // -----------------------------------------------------------------
+  // 📌 2. 'user_ingredients' 테이블에서 모든 재료 가져오기 is_owned 포함해서
+  // (테이블명 'ingredients', 컬럼명 'id', 'name'으로 가정)
+  // -----------------------------------------------------------------
+  Future<List<Map<String, dynamic>>> getUserIngredients() async {
     Database db = await instance.database;
     // 'name' 컬럼 기준으로 가나다순 정렬
     return await db.query('ingredients', orderBy: 'name ASC');

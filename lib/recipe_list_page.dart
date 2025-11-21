@@ -131,7 +131,11 @@ class _RecipeListPageState extends State<RecipeListPage> {
           // -------------------------------------------------------
         ),
         body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+              child: CircularProgressIndicator(
+                color: Color.fromARGB(207, 255, 136, 62),
+              )
+            )
             : _buildRecipeList(),
       );
     }

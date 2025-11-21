@@ -104,5 +104,5 @@ flutter_launcher_icons:
   remove_original_ios_app_icon: true
 
 # Android 12 이상을 위한 Adaptive Icon 설정 (선택 사항)
-# adaptive_icon_background: "#FFFFFF" # 배경색 (hex code)
-# adaptive_icon_foreground: "assets/foreground.png" # 아이콘 전경 이미지 (테두리 부분 제외)
+  adaptive_icon_background: "#FFFFFF" # 배경색 (hex code)
+  adaptive_icon_foreground: "assets/foreground.png" # 아이콘 전경 이미지 (테두리 부분 제외)

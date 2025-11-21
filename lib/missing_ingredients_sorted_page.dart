@@ -79,7 +79,11 @@ class _MissingIngredientsSortedPageState extends State<MissingIngredientsSortedP
         title: const Text('부족한 재료 (3개 이상)'),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+            child: CircularProgressIndicator(
+              color: Color.fromARGB(207, 255, 136, 62),
+            )
+          )
           : _buildListView(),
     );
   }

@@ -131,7 +131,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         title: Text(_recipeDetail?.name ?? '로딩 중...'),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+            child: CircularProgressIndicator(
+              color: Color.fromARGB(207, 255, 136, 62),
+            )
+          )
           : _buildRecipeContent(), // 스크롤 가능한 본문
     );
   }

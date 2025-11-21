@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // -----------------------------------------------------------------
   Future<void> _loadData() async {
     // 1. 'ingredients' 테이블에서 모든 재료 목록 가져오기 (is_owned 포함)
-    final ingredientsData = await _dbHelper.getAllIngredients();
+    final ingredientsData = await _dbHelper.getUserIngredients();
 
     setState(() {
       _allIngredients = ingredientsData.map((map) => Ingredient.fromMap(map)).toList();
@@ -108,13 +108,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('보유 재료 체크'),
-        backgroundColor: Colors.white,
-        elevation: 1,
+        title: const Text(
+          '보유 재료 체크',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       backgroundColor: Colors.grey[50],
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+            child: CircularProgressIndicator(
+              color: Color.fromARGB(207, 255, 136, 62)
+            )
+          )
           : ListView.builder(
               itemCount: _allIngredients.length,
               itemBuilder: (context, index) {
@@ -139,8 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: _saveSelection, // '완료' 누르면 3번 함수 호출
         icon: const Icon(Icons.check),
         label: const Text('완료'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(207, 255, 136, 62),
+        foregroundColor: Colors.black,
       ),
     );
     // ---------------------------------------------------------

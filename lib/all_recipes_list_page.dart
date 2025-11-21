@@ -59,16 +59,24 @@ class _AllRecipesListPageState extends State<AllRecipesListPage> {
     // 탭 페이지에 종속되므로 자체 Scaffold/AppBar가 필요
     return Scaffold(
       appBar: AppBar(
-        title: const Text('전체 레시피'),
-        backgroundColor: Colors.white,
-        elevation: 1,
+        title: const Text(
+          '전체 레시피',
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+            child: CircularProgressIndicator(
+              color: Color.fromARGB(207, 255, 136, 62),
+            )
+          )
           : _buildListView(),
       floatingActionButton: FloatingActionButton(
         onPressed: _loadData,
         tooltip: '새로고침',
+        backgroundColor: Color.fromARGB(207, 255, 136, 62),
         child: const Icon(Icons.refresh),
       ),
     );
@@ -76,7 +84,14 @@ class _AllRecipesListPageState extends State<AllRecipesListPage> {
 
   Widget _buildListView() {
     if (_recipes.isEmpty) {
-      return const Center(child: Text('레시피가 없습니다.'));
+      return const Center(
+        child: Text(
+          '레시피가 없습니다.',
+          style: TextStyle(
+            fontSize: 18.0,
+          ),
+        )
+      );
     }
 
     // 당겨서 새로고침

@@ -80,18 +80,26 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     // 그 페이지의 AppBar를 사용합니다.
     return Scaffold(
       appBar: AppBar(
-        title: const Text('장바구니'),
-        backgroundColor: Colors.white,
-        elevation: 1,
+        title: const Text(
+          '장바구니',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+            child: CircularProgressIndicator(
+              color: Color.fromARGB(207, 255, 136, 62),
+            )
+          )
           : _buildShoppingListView(),
       // 📌 새로고침 버튼 (Pull-to-refresh 대신)
       // (다른 탭에 갔다가 돌아올 때 자동으로 새로고침 되도록 구현할 수도 있음)
       floatingActionButton: FloatingActionButton(
         onPressed: _loadShoppingList,
         tooltip: '새로고침',
+        backgroundColor: Color.fromARGB(207, 255, 136, 62),
         child: const Icon(Icons.refresh),
       ),
     );
