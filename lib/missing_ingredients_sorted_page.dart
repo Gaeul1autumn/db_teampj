@@ -27,7 +27,14 @@ class RecipeWithMissingCount {
 }
 
 class MissingIngredientsSortedPage extends StatefulWidget {
-  const MissingIngredientsSortedPage({super.key});
+  final List<int>? tagIds;
+  final bool? isTagDisabled;
+
+  const MissingIngredientsSortedPage({
+    super.key,
+    this.tagIds,
+    this.isTagDisabled,
+  });
 
   @override
   State<MissingIngredientsSortedPage> createState() => _MissingIngredientsSortedPageState();
@@ -53,7 +60,10 @@ class _MissingIngredientsSortedPageState extends State<MissingIngredientsSortedP
 
     try {
       // 1번 파일에서 만든 새 함수 호출
-      final data = await _dbHelper.getRecipesMissingThreeOrMoreSorted();
+      final data = await _dbHelper.getRecipesMissingThreeOrMoreSorted(
+        tagIds: widget.tagIds,
+        isTagDisabled: widget.isTagDisabled,
+      );
 
       if (mounted) {
         setState(() {

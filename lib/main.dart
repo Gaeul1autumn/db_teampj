@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '레시피 추천 앱',
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromARGB(244, 251, 249, 244),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 251, 249, 244),
         primarySwatch: Colors.blue,
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.white, // 배경색을 흰색으로 설정

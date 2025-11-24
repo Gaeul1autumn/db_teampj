@@ -8,7 +8,7 @@ import 'package:path/path.dart';
 import 'recipe_detail_page.dart';
 
 class DatabaseHelper {
-  // DB 파일 이름을 'my_data.db'로 가정합니다.
+  // DB 파일 이름을 'app.db'로 가정합니다.
   // 1단계에서 사용한 파일 이름과 동일해야 합니다.
   static const String _databaseName = "app.db";
   static Database? _database;
@@ -76,9 +76,16 @@ class DatabaseHelper {
   // (테이블명 'ingredients', 컬럼명 'id', 'name'으로 가정)
   // -----------------------------------------------------------------
   Future<List<Map<String, dynamic>>> getUserIngredients() async {
-    Database db = await instance.database;
+    //FIXME: 테스트용 주석 이므로 실제 디비 연결시 아래 주석 해지 요망 
+    //Database db = await instance.database; 
     // 'name' 컬럼 기준으로 가나다순 정렬
-    return await db.query('ingredients', orderBy: 'name ASC');
+    //return await db.query('ingredients', orderBy: 'name ASC');
+    //테스트용 더미 데이터 디비 연결 후에 삭제 요망!!
+    return [
+    {'id': 1, 'name': '토마토', 'is_owned': 1},
+    {'id': 2, 'name': '양파', 'is_owned': 0},
+    {'id': 3, 'name': '당근', 'is_owned': 1},
+  ];
   }
 
 
@@ -115,17 +122,29 @@ class DatabaseHelper {
   // -----------------------------------------------------------------
   // 📌 4. (신규) 만들 수 있는 레시피 목록 가져오기
   // -----------------------------------------------------------------
-  Future<List<Map<String, dynamic>>> getAvailableRecipes() async {
+  Future<List<Map<String, dynamic>>> getAvailableRecipes({
+    List<int>? tagIds, 
+    bool? isTagDisabled
+  }) async {
     Database db = await instance.database;
 
     // FIXME: 쿼리작성 필수
     // ---------------------------------------------------------
-    // ⬇️ [사용자 직접 작성] 
-    // ⬇️ 여기에 ingredients 테이블(is_owned=1)과 
-    // ⬇️ 다른 테이블을 조인하는 쿼리를 작성하세요.
+    // ⬇️ [사용자 직접 작성]
+    // ⬇️ 태그 필터링 로직을 추가하세요.
     // ---------------------------------------------------------
+    // 로직 예시:
+    // 1. isTagDisabled가 true이면 -> 기존과 동일 (태그 무시)
+    // 2. isTagDisabled가 false이고 tagIds가 있다면 ->
+    //    레시피 테이블과 recipe_tags 테이블을 조인하여
+    //    선택된 tagIds 중 하나라도 포함하는(OR) 혹은 모두 포함하는(AND) 레시피만 필터링
     
-    // 예시: 쿼리 결과를 'recipe_id'와 'recipe_name'으로 반환한다고 가정
+    /*
+    String query = "SELECT ... FROM recipes ...";
+    if (isTagDisabled == false && tagIds != null && tagIds.isNotEmpty) {
+       query += " AND id IN (SELECT recipe_id FROM recipe_tags WHERE tag_id IN (${tagIds.join(',')}))";
+    }
+    */
     final String myCustomQuery = """
       SELECT 
         r.id as recipe_id, 
@@ -152,7 +171,64 @@ class DatabaseHelper {
     ];
   }
 
-  Future<List<Map<String, dynamic>>> getRecipesMissingOne() async {
+  // -----------------------------------------------------------------
+  // 📌 14. [통합] 모든 레시피를 가져오되, 부족한 재료 개수를 포함하여 반환
+  // -----------------------------------------------------------------
+  Future<List<Map<String, dynamic>>> getIntegratedRecipeList({
+    List<int>? tagIds, 
+    bool? isTagDisabled
+  }) async {
+    Database db = await instance.database;
+
+    // 1. 기본 쿼리: 레시피 정보 + 부족한 재료 개수(missing_count) 계산
+    // COUNT(CASE WHEN i.is_owned = 0 THEN 1 END): 보유하지 않은 재료만 카운트
+    String query = """
+      SELECT 
+        r.id as recipe_id, 
+        r.name as recipe_name,
+        r.cooking_time_minutes, -- (선택) 요리 시간도 보여주면 좋음
+        COUNT(CASE WHEN i.is_owned = 0 THEN 1 END) as missing_count
+      FROM recipes r
+      JOIN recipe_ingredients ri ON r.id = ri.recipe_id
+      JOIN ingredients i ON ri.ingredient_id = i.id
+    """;
+
+    // 2. 태그 필터링 조건 추가 (WHERE 절)
+    // 태그 사용 안함이 아니고, 태그 리스트가 있을 때
+    if (isTagDisabled != true && tagIds != null && tagIds.isNotEmpty) {
+       String idsString = tagIds.join(',');
+       // 선택된 태그를 하나라도 가진 레시피만 조회
+       query += " WHERE r.id IN (SELECT recipe_id FROM recipe_tags WHERE tag_id IN ($idsString))";
+    }
+
+    // 3. 그룹화 및 정렬
+    // missing_count가 적은 순(0 -> 1 -> 2...)으로 정렬
+    query += """
+      GROUP BY r.id
+      ORDER BY missing_count ASC, r.name ASC
+    """;
+
+    // return await db.rawQuery(query);
+
+    // ---------------------------------------------------------
+    // ⚠️ [테스트용 임시 데이터] 
+    // ---------------------------------------------------------
+    print("통합 리스트 쿼리 실행 (태그필터: ${tagIds?.length ?? 0}개)");
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    return [
+      {'recipe_id': 101, 'recipe_name': '김치찌개', 'missing_count': 0, 'cooking_time_minutes': 20},
+      {'recipe_id': 102, 'recipe_name': '계란말이', 'missing_count': 0, 'cooking_time_minutes': 10},
+      {'recipe_id': 201, 'recipe_name': '된장찌개', 'missing_count': 1, 'cooking_time_minutes': 25},
+      {'recipe_id': 202, 'recipe_name': '제육볶음', 'missing_count': 2, 'cooking_time_minutes': 30},
+      {'recipe_id': 301, 'recipe_name': '갈비찜', 'missing_count': 5, 'cooking_time_minutes': 60},
+    ];
+  }
+
+  Future<List<Map<String, dynamic>>> getRecipesMissingOne({
+    List<int>? tagIds, 
+    bool? isTagDisabled,
+  }) async {
     Database db = await instance.database;
 
     //FIXME: 쿼리작성
@@ -161,6 +237,22 @@ class DatabaseHelper {
     // ⬇️ (is_owned=1)을 기반으로, 부족한 재료가 "1개"인 레시피를 찾는
     // ⬇️ 쿼리를 작성하세요.
     // ---------------------------------------------------------
+    // ---------------------------------------------------------
+    // ⬇️ [사용자 직접 작성]
+    // ⬇️ 태그 필터링 로직을 추가하세요.
+    // ---------------------------------------------------------
+    // 로직 예시:
+    // 1. isTagDisabled가 true이면 -> 기존과 동일 (태그 무시)
+    // 2. isTagDisabled가 false이고 tagIds가 있다면 ->
+    //    레시피 테이블과 recipe_tags 테이블을 조인하여
+    //    선택된 tagIds 중 하나라도 포함하는(OR) 혹은 모두 포함하는(AND) 레시피만 필터링
+    
+    /*
+    String query = "SELECT ... FROM recipes ...";
+    if (isTagDisabled == false && tagIds != null && tagIds.isNotEmpty) {
+       query += " AND id IN (SELECT recipe_id FROM recipe_tags WHERE tag_id IN (${tagIds.join(',')}))";
+    }
+    */
     final String myCustomQuery = """
       SELECT 
         r.id as recipe_id, 
@@ -188,7 +280,10 @@ class DatabaseHelper {
   // -----------------------------------------------------------------
   // 📌 6. (신규) 부족한 재료가 2개인 레시피
   // -----------------------------------------------------------------
-  Future<List<Map<String, dynamic>>> getRecipesMissingTwo() async {
+  Future<List<Map<String, dynamic>>> getRecipesMissingTwo({
+    List<int>? tagIds, 
+    bool? isTagDisabled,
+  }) async {
     Database db = await instance.database;
 
     //FIXME: 쿼리작성
@@ -197,6 +292,22 @@ class DatabaseHelper {
     // ⬇️ (is_owned=1)을 기반으로, 부족한 재료가 "2개"인 레시피를 찾는
     // ⬇️ 쿼리를 작성하세요.
     // ---------------------------------------------------------
+    // ---------------------------------------------------------
+    // ⬇️ [사용자 직접 작성]
+    // ⬇️ 태그 필터링 로직을 추가하세요.
+    // ---------------------------------------------------------
+    // 로직 예시:
+    // 1. isTagDisabled가 true이면 -> 기존과 동일 (태그 무시)
+    // 2. isTagDisabled가 false이고 tagIds가 있다면 ->
+    //    레시피 테이블과 recipe_tags 테이블을 조인하여
+    //    선택된 tagIds 중 하나라도 포함하는(OR) 혹은 모두 포함하는(AND) 레시피만 필터링
+    
+    /*
+    String query = "SELECT ... FROM recipes ...";
+    if (isTagDisabled == false && tagIds != null && tagIds.isNotEmpty) {
+       query += " AND id IN (SELECT recipe_id FROM recipe_tags WHERE tag_id IN (${tagIds.join(',')}))";
+    }
+    */
     final String myCustomQuery = """
       SELECT 
         r.id as recipe_id, 
@@ -217,6 +328,73 @@ class DatabaseHelper {
     await Future.delayed(const Duration(milliseconds: 500));
     return [
       {'recipe_id': 301, 'recipe_name': '파스타 (부족 2개)'},
+    ];
+  }
+
+  // -----------------------------------------------------------------
+  // 📌 12. (신규) 부족한 재료 3개 이상 (부족한 순으로 정렬)
+  // -----------------------------------------------------------------
+  Future<List<Map<String, dynamic>>> getRecipesMissingThreeOrMoreSorted({
+    List<int>? tagIds, 
+    bool? isTagDisabled,
+  }) async {
+    Database db = await instance.database;
+
+    //FIXME: 쿼리 작성
+    // ---------------------------------------------------------
+    // ⬇️ [사용자 직접 작성]
+    // ⬇️ (is_owned=1)을 기반으로, 부족한 재료가 "3개 이상"인 레시피를 찾는
+    // ⬇️ 쿼리를 작성하세요.
+    //
+    // ⬇️ (중요!) 쿼리 결과에 'missing_count' (부족한 재료 개수) 컬럼이
+    // ⬇️ *반드시* 포함되어야 하며, 이 값을 기준으로 정렬(ORDER BY)해야 합니다.
+    // ---------------------------------------------------------
+    // ---------------------------------------------------------
+    // ⬇️ [사용자 직접 작성]
+    // ⬇️ 태그 필터링 로직을 추가하세요.
+    // ---------------------------------------------------------
+    // 로직 예시:
+    // 1. isTagDisabled가 true이면 -> 기존과 동일 (태그 무시)
+    // 2. isTagDisabled가 false이고 tagIds가 있다면 ->
+    //    레시피 테이블과 recipe_tags 테이블을 조인하여
+    //    선택된 tagIds 중 하나라도 포함하는(OR) 혹은 모두 포함하는(AND) 레시피만 필터링
+    
+    /*
+    String query = "SELECT ... FROM recipes ...";
+    if (isTagDisabled == false && tagIds != null && tagIds.isNotEmpty) {
+       query += " AND id IN (SELECT recipe_id FROM recipe_tags WHERE tag_id IN (${tagIds.join(',')}))";
+    }
+    */
+    
+    final String myCustomQuery = """
+      SELECT 
+        r.id as recipe_id, 
+        r.name as recipe_name, 
+        -- (예시) 부족한 재료 개수를 계산하는 로직
+        (COUNT(CASE WHEN i.is_owned = 0 THEN 1 END)) as missing_count
+      FROM recipes r
+      JOIN recipe_ingredients ri ON r.id = ri.recipe_id
+      JOIN ingredients i ON ri.ingredient_id = i.id
+      GROUP BY r.id, r.name
+      HAVING missing_count >= 3
+      ORDER BY 
+        missing_count ASC, -- 1. 부족한 개수 적은 순
+        r.name ASC;        -- 2. (같을 경우) 이름 가나다 순
+    """;
+    
+    // return await db.rawQuery(myCustomQuery);
+    
+    // ---------------------------------------------------------
+    // ⬆️ [사용자 직접 작성]
+    // ---------------------------------------------------------
+
+    // ⚠️ 임시 반환 값 (테스트용)
+    print("임시 데이터 (부족 3+ 정렬) 반환. 쿼리를 작성해주세요.");
+    await Future.delayed(const Duration(milliseconds: 500));
+    return [
+      {'recipe_id': 401, 'recipe_name': '갈비찜 (테스트)', 'missing_count': 3},
+      {'recipe_id': 402, 'recipe_name': '잡채 (테스트)', 'missing_count': 3},
+      {'recipe_id': 501, 'recipe_name': '신선로 (테스트)', 'missing_count': 5},
     ];
   }
 
@@ -377,7 +555,10 @@ class DatabaseHelper {
   // -----------------------------------------------------------------
   // 📌 11. (신규) 'recipes' 테이블의 모든 레시피 목록 가져오기
   // -----------------------------------------------------------------
-  Future<List<Map<String, dynamic>>> getFullRecipeList() async {
+  Future<List<Map<String, dynamic>>> getFullRecipeList({
+    List<int>? tagIds, 
+    bool? isTagDisabled,
+  }) async {
     Database db = await instance.database;
     
     //FIXME: 쿼리 작성
@@ -386,6 +567,22 @@ class DatabaseHelper {
     // ⬇️ 'recipes' 테이블에서 ID와 이름 등 기본 정보만 가져오는
     // ⬇️ 쿼리를 작성하세요.
     // ---------------------------------------------------------
+    // ---------------------------------------------------------
+    // ⬇️ [사용자 직접 작성]
+    // ⬇️ 태그 필터링 로직을 추가하세요.
+    // ---------------------------------------------------------
+    // 로직 예시:
+    // 1. isTagDisabled가 true이면 -> 기존과 동일 (태그 무시)
+    // 2. isTagDisabled가 false이고 tagIds가 있다면 ->
+    //    레시피 테이블과 recipe_tags 테이블을 조인하여
+    //    선택된 tagIds 중 하나라도 포함하는(OR) 혹은 모두 포함하는(AND) 레시피만 필터링
+    
+    /*
+    String query = "SELECT ... FROM recipes ...";
+    if (isTagDisabled == false && tagIds != null && tagIds.isNotEmpty) {
+       query += " AND id IN (SELECT recipe_id FROM recipe_tags WHERE tag_id IN (${tagIds.join(',')}))";
+    }
+    */
     
     // 예시: 쿼리 결과를 'recipe_id'와 'recipe_name'으로 반환한다고 가정
     final String myCustomQuery = """
@@ -413,53 +610,6 @@ class DatabaseHelper {
     ];
   }
 
-  // -----------------------------------------------------------------
-  // 📌 12. (신규) 부족한 재료 3개 이상 (부족한 순으로 정렬)
-  // -----------------------------------------------------------------
-  Future<List<Map<String, dynamic>>> getRecipesMissingThreeOrMoreSorted() async {
-    Database db = await instance.database;
-
-    //FIXME: 쿼리 작성
-    // ---------------------------------------------------------
-    // ⬇️ [사용자 직접 작성]
-    // ⬇️ (is_owned=1)을 기반으로, 부족한 재료가 "3개 이상"인 레시피를 찾는
-    // ⬇️ 쿼리를 작성하세요.
-    //
-    // ⬇️ (중요!) 쿼리 결과에 'missing_count' (부족한 재료 개수) 컬럼이
-    // ⬇️ *반드시* 포함되어야 하며, 이 값을 기준으로 정렬(ORDER BY)해야 합니다.
-    // ---------------------------------------------------------
-    
-    final String myCustomQuery = """
-      SELECT 
-        r.id as recipe_id, 
-        r.name as recipe_name, 
-        -- (예시) 부족한 재료 개수를 계산하는 로직
-        (COUNT(CASE WHEN i.is_owned = 0 THEN 1 END)) as missing_count
-      FROM recipes r
-      JOIN recipe_ingredients ri ON r.id = ri.recipe_id
-      JOIN ingredients i ON ri.ingredient_id = i.id
-      GROUP BY r.id, r.name
-      HAVING missing_count >= 3
-      ORDER BY 
-        missing_count ASC, -- 1. 부족한 개수 적은 순
-        r.name ASC;        -- 2. (같을 경우) 이름 가나다 순
-    """;
-    
-    // return await db.rawQuery(myCustomQuery);
-    
-    // ---------------------------------------------------------
-    // ⬆️ [사용자 직접 작성]
-    // ---------------------------------------------------------
-
-    // ⚠️ 임시 반환 값 (테스트용)
-    print("임시 데이터 (부족 3+ 정렬) 반환. 쿼리를 작성해주세요.");
-    await Future.delayed(const Duration(milliseconds: 500));
-    return [
-      {'recipe_id': 401, 'recipe_name': '갈비찜 (테스트)', 'missing_count': 3},
-      {'recipe_id': 402, 'recipe_name': '잡채 (테스트)', 'missing_count': 3},
-      {'recipe_id': 501, 'recipe_name': '신선로 (테스트)', 'missing_count': 5},
-    ];
-  }
 
   // -----------------------------------------------------------------
   // 📌 13. (신규) 모든 재료의 보유 상태(is_owned)를 초기화(false)하기

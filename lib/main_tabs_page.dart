@@ -8,17 +8,17 @@ class MainTabsPage extends StatefulWidget {
 
   @override
   State<MainTabsPage> createState() => _MainTabsPageState();
+
 }
 
 class _MainTabsPageState extends State<MainTabsPage> {
   int _selectedIndex = 0; // 현재 선택된 탭 인덱스
 
-  // 1. 하단 탭으로 보여줄 페이지 목록
-  // 📌 IndexedStack: 탭이 전환되어도 각 페이지의 상태를 보존 (스크롤 위치 등)
+  // 탭 리스트: 홈(재료선택) / 전체레시피 / 장바구니
   static final List<Widget> _widgetOptions = <Widget>[
-    const HomeScreen(),        // 탭 0: 기존 재료 관리 화면
-    const AllRecipesListPage(), // 탭1: 모든 레시피 출력 화면
-    const ShoppingListPage(),  // 탭 2: 새로 만든 장바구니 화면
+    const HomeScreen(),         // 탭 0
+    const AllRecipesListPage(), // 탭 1
+    const ShoppingListPage(),   // 탭 2
   ];
 
   // 2. 탭을 클릭했을 때 호출될 함수

@@ -23,7 +23,14 @@ class Recipe {
 }
 
 class RecipeListPage extends StatefulWidget {
-  const RecipeListPage({super.key});
+  final List<int>? tagIds;
+  final bool? isTagDisabled;
+
+  const RecipeListPage({
+    super.key, 
+    this.tagIds, 
+    this.isTagDisabled
+  });
 
   @override
   State<RecipeListPage> createState() => _RecipeListPageState();
@@ -45,7 +52,11 @@ class _RecipeListPageState extends State<RecipeListPage> {
   Future<void> _loadRecipes() async {
     try {
       // 1번 파일에서 사용자가 쿼리를 작성할 함수 호출
-      final recipeData = await _dbHelper.getAvailableRecipes();
+      // 📌 DB 헬퍼 함수 호출 시 필터 정보 전달
+      final recipeData = await _dbHelper.getAvailableRecipes(
+        tagIds: widget.tagIds,
+        isTagDisabled: widget.isTagDisabled,
+      );
 
       if (mounted) {
         setState(() {
@@ -76,9 +87,13 @@ class _RecipeListPageState extends State<RecipeListPage> {
     Widget build(BuildContext context) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('추천 레시피 목록'),
-          backgroundColor: Colors.white,
-          elevation: 1,
+          title: const Text(
+            '추천 레시피 목록',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            )
+          ),
+          backgroundColor: Color.fromARGB(207, 255, 136, 62),
           // -------------------------------------------------------
           // 📌 (신규) 우측 상단 아이콘 버튼 2개 추가
           // -------------------------------------------------------
@@ -91,8 +106,10 @@ class _RecipeListPageState extends State<RecipeListPage> {
                   context,
                   MaterialPageRoute(
                     // 3번에서 만들 페이지로 '1'을 전달
-                    builder: (context) => const MissingIngredientsPage(
+                    builder: (context) =>  MissingIngredientsPage(
                       missingCount: 1,
+                      tagIds: widget.tagIds,
+                      isTagDisabled: widget.isTagDisabled,
                     ),
                   ),
                 );
@@ -106,8 +123,10 @@ class _RecipeListPageState extends State<RecipeListPage> {
                   context,
                   MaterialPageRoute(
                     // 3번에서 만들 페이지로 '2'를 전달
-                    builder: (context) => const MissingIngredientsPage(
+                    builder: (context) =>  MissingIngredientsPage(
                       missingCount: 2,
+                      tagIds: widget.tagIds,
+                      isTagDisabled: widget.isTagDisabled,
                     ),
                   ),
                 );
@@ -121,7 +140,10 @@ class _RecipeListPageState extends State<RecipeListPage> {
                 context,
                 MaterialPageRoute(
                   // 3번에서 만들 새 페이지로 이동
-                  builder: (context) => const MissingIngredientsSortedPage(),
+                  builder: (context) =>  MissingIngredientsSortedPage(
+                    tagIds: widget.tagIds,
+                    isTagDisabled: widget.isTagDisabled,
+                  ),
                 ),
               );
             },

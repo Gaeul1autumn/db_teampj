@@ -22,9 +22,14 @@ class MissingIngredientsPage extends StatefulWidget {
   // 이 페이지가 1개 부족 리스트인지, 2개 부족 리스트인지 결정
   final int missingCount; 
   
+  final List<int>? tagIds;
+  final bool? isTagDisabled;
+  
   const MissingIngredientsPage({
     super.key, 
     required this.missingCount,
+    this.tagIds,       // 생성자 추가
+    this.isTagDisabled, // 생성자 추가
   });
 
   @override
@@ -59,9 +64,15 @@ class _MissingIngredientsPageState extends State<MissingIngredientsPage> {
       // 📌 파라미터 값에 따라 분기
       // -------------------------------------------------
       if (widget.missingCount == 1) {
-        recipeData = await _dbHelper.getRecipesMissingOne();
+        recipeData = await _dbHelper.getRecipesMissingOne(
+          tagIds: widget.tagIds,
+          isTagDisabled: widget.isTagDisabled,
+        );
       } else if (widget.missingCount == 2) {
-        recipeData = await _dbHelper.getRecipesMissingTwo();
+        recipeData = await _dbHelper.getRecipesMissingTwo(
+          tagIds: widget.tagIds,
+          isTagDisabled: widget.isTagDisabled,
+        );
       } else {
         // 혹시 모를 예외 처리
         recipeData = [];
