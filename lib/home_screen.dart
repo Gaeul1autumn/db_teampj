@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'recipe_list_page.dart';
-import 'main_tabs_page.dart';
 
 // -----------------------------------------------------------------
 // 📌 1. 모델 클래스 수정
@@ -20,7 +19,7 @@ class Ingredient {
 
   factory Ingredient.fromMap(Map<String, dynamic> map) {
     return Ingredient(
-      id: map['id'],
+      id: map['Id'],
       name: map['name'],
       // DB의 'is_owned' 컬럼이 0 또는 1 (INTEGER)이라고 가정
       isOwned: map['is_owned'] == 1,
@@ -108,7 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _initPage() async {
     // 1. 먼저 DB의 모든 체크박스 상태를 0(false)으로 초기화
     //테스트 때문에 주석
-    //await _dbHelper.resetAllIngredientStatus();
+    print("is_owned 전부 초기화 완료");
+    await _dbHelper.resetAllIngredientStatus();
 
     // 2. 초기화가 끝난 후 데이터를 불러와 화면에 그리기
     // (이때 불러오면 모두 false 상태로 불러와집니다)
@@ -145,8 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // -----------------------------------------------------------------
   Future<void> _saveSelection() async {
     try {
-      // 1. 재료 상태 저장 FIXME: 디비 연결 후 주석 제거
-      //await _dbHelper.updateOwnedStatus(_checkedStatus);
+      await _dbHelper.updateOwnedStatus(_checkedStatus);
 
       if (!mounted) return;
       List<String> selectedNames = _getSelectedTagNames();
@@ -288,6 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
         label: const Text('완료 (레시피 보기)'),
         backgroundColor: Color.fromARGB(207, 255, 136, 62),
         foregroundColor: Colors.black,
+        heroTag: "home_complete_btn",
       ),
     );
   }
