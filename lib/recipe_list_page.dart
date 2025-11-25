@@ -11,7 +11,7 @@ class Recipe {
   final String name;
   final int missingCount;
   final int? cookingTime;
-  final String? difficulty;
+  final int? difficulty;
 
   Recipe({
     required this.id,
@@ -96,16 +96,20 @@ class _RecipeListPageState extends State<RecipeListPage> {
     await _loadRecipes();
   }
 
-  int _starCount(String difficulty) {
+  String _difficultyToString(int difficulty) {
   switch (difficulty) {
-    case "쉬움":
-      return 1;
-    case "보통":
-      return 2;
-    case "어려움":
-      return 3;
+    case 1:
+      return "매우 쉬움";
+    case 2:
+      return "쉬움";
+    case 3:
+      return "보통";
+    case 4:
+      return "어려움";
+    case 5:
+      return "매우 어려움";
     default:
-      return 0;
+      return "error";
   }
 }
 
@@ -253,8 +257,8 @@ class _RecipeListPageState extends State<RecipeListPage> {
                     // 2. 난이도 (데이터가 있을 때만)
                     if (recipe.difficulty != null) ...[
                      Row(
-                      children: List.generate(3, (index) {
-                        final starCount = _starCount(recipe.difficulty!);
+                      children: List.generate(5, (index) {
+                        final starCount = recipe.difficulty!;
                         return Icon(
                           index < starCount ? Icons.star : Icons.star_border,
                           size: 14,
@@ -264,7 +268,7 @@ class _RecipeListPageState extends State<RecipeListPage> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      recipe.difficulty!,
+                      _difficultyToString(recipe.difficulty!),
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                     ],

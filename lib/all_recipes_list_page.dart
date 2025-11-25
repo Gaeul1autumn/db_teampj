@@ -55,12 +55,14 @@ class _AllRecipesListPageState extends State<AllRecipesListPage> {
       const Tag(id: 5, name: "디저트"),
     ],
     "난이도": [
-      const Tag(id: 10, name: "쉬움"),
-      const Tag(id: 11, name: "보통"), const Tag(id: 12, name: "어려움"),
+      const Tag(id: 10, name: "매우 쉬움"),
+      const Tag(id: 11, name: "쉬움"), const Tag(id: 12, name: "보통"),
+      const Tag(id: 13, name: "어려움"),const Tag(id: 14, name: "매우 어려움")
     ],
     "조리기구": [
       const Tag(id: 20, name: "프라이팬"), const Tag(id: 21, name: "전자레인지"),
       const Tag(id: 22, name: "에어프라이어"), const Tag(id: 23, name: "오븐"),
+      const Tag(id: 23, name: "냄비")
     ],
   };
 

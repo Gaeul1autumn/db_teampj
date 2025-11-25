@@ -10,7 +10,7 @@ class RecipeDetail {
   final String? description;
   final String? imagePath;
   final int? cookingTime;
-  final String? difficulty;
+  final int? difficulty;
 
   RecipeDetail({
     required this.id,
@@ -102,18 +102,22 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     _loadRecipeData();
   }
 
-  int _starCount(String difficulty) {
-  switch (difficulty) {
-    case "쉬움":
-      return 1;
-    case "보통":
-      return 2;
-    case "어려움":
-      return 3;
-    default:
-      return 0;
+  String _difficultyToString(int difficulty) {
+    switch (difficulty) {
+      case 1:
+        return "매우 쉬움";
+      case 2:
+        return "쉬움";
+      case 3:
+        return "보통";
+      case 4:
+        return "어려움";
+      case 5:
+        return "매우 어려움";
+      default:
+        return "error";
+    }
   }
-}
 
   // 함수를 호출하여 3종류의 데이터를 모두 로드
   Future<void> _loadRecipeData() async {
@@ -232,8 +236,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
 
                   const SizedBox(width: 12),
                   Row(
-                    children: List.generate(3, (index) {
-                      final starCount = _starCount(_recipeDetail!.difficulty ?? "");
+                    children: List.generate(5, (index) {
+                      final starCount = _recipeDetail!.difficulty!;
                       return Icon(
                         index < starCount ? Icons.star : Icons.star_border,
                         size: 16,
@@ -245,7 +249,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   const SizedBox(width: 4),
                   // 난이도 텍스트
                   Text(
-                    _recipeDetail!.difficulty ?? "",
+                    _difficultyToString(_recipeDetail!.difficulty!),
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],

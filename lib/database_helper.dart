@@ -207,7 +207,7 @@ class DatabaseHelper {
     await Future.delayed(const Duration(milliseconds: 500));
     
     return [
-      {'recipe_id': 101, 'recipe_name': '김치찌개', 'missing_count': 0, 'cooking_time_minutes': 20, 'difficulty':"어려움"},
+      {'recipe_id': 101, 'recipe_name': '김치찌개', 'missing_count': 0, 'cooking_time_minutes': 20, 'difficulty':2},
       {'recipe_id': 102, 'recipe_name': '계란말이', 'missing_count': 0, 'cooking_time_minutes': 10},
       {'recipe_id': 201, 'recipe_name': '된장찌개', 'missing_count': 1, 'cooking_time_minutes': 25},
       {'recipe_id': 202, 'recipe_name': '제육볶음', 'missing_count': 2, 'cooking_time_minutes': 30},
@@ -299,7 +299,7 @@ class DatabaseHelper {
         'description': '보유 재료로 만들 수 있는 맛있는 레시피입니다. 쿼리를 연결해주세요.',
         'image_path': 'https://i.namu.wiki/i/8drgvI-cQLUfJDC00zbl2ZolK4W3o4ZkVSpR-zM5FZk_QzT58vYnx_7ohk0qwGYYiSLPiZgwccyIEFUtYKDjUQ.webp', 
         'cooking_time_minutes': 30,
-        'difficulty':"어려움"
+        'difficulty':2
       },
       'ingredients': [
         {'ingredient_id': 1, 'name': '보유한 재료 (예: 양파)', 'is_owned': 1, 'quantity': '1개'},
