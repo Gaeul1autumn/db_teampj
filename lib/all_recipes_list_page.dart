@@ -62,7 +62,7 @@ class _AllRecipesListPageState extends State<AllRecipesListPage> {
     "조리기구": [
       const Tag(id: 20, name: "프라이팬"), const Tag(id: 21, name: "전자레인지"),
       const Tag(id: 22, name: "에어프라이어"), const Tag(id: 23, name: "오븐"),
-      const Tag(id: 23, name: "냄비")
+      const Tag(id: 24, name: "냄비")
     ],
   };
 
