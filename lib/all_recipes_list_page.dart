@@ -257,8 +257,14 @@ class _AllRecipesListPageState extends State<AllRecipesListPage> {
                       onSelected: (bool selected) {
                         setState(() {
                           if (selected) {
+                            // 1. 현재 카테고리에 있는 다른 태그들을 모두 선택 해제!
+                            for (var t in tags) {
+                              _selectedTagIds.remove(t.id);
+                            }
+                            // 2. 방금 클릭한 태그만 추가
                             _selectedTagIds.add(tag.id);
                           } else {
+                            // 이미 선택된 걸 다시 누르면 해제 (선택 안 함 상태 가능)
                             _selectedTagIds.remove(tag.id);
                           }
                         });

@@ -118,7 +118,7 @@ class DatabaseHelper {
       SELECT 
         r.id as recipe_id, 
         r.name as recipe_name,
-        r.cooking_time_minutes, -- (선택) 요리 시간도 보여주면 좋음
+        r.cooking_time_minutes, 
         r.difficulty,
         COUNT(CASE WHEN i.is_owned = 0 THEN 1 END) as missing_count
       FROM recipes r
